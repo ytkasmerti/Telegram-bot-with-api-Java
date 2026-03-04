@@ -1,8 +1,10 @@
 package org.example;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DogInfo {
+    @JsonIgnore
     public String image_link;
     public String good_with_children;
     public String good_with_other_dogs;
@@ -76,5 +78,25 @@ public class DogInfo {
         this.min_weight_male = min_weight_male;
         this.min_weight_female = min_weight_female;
         this.name = name;
+    }
+
+    public static String getTranslate() {
+        return ("Информация о собаках:\n" +
+                "main_prey - основная добыча\n" +
+                "distinctive_feature - отличительная особенность\n" +
+                "habitat - среда обитания\n" +
+                "predators - хищники\n" +
+                "diet - рацион\n" +
+                "average_litter_size - средний размер потомства\n" +
+                "lifestyle - образ жизни\n" +
+                "favorite_food - любимая еда\n" +
+                "type - тип\n" +
+                "slogan - девиз\n" +
+                "color - окрас\n" +
+                "skin_type - тип кожи\n" +
+                "top_speed - максимальная скорость\n" +
+                "lifespan - продолжительность жизни\n" +
+                "weight - вес\n" +
+                "length - длина");
     }
 }

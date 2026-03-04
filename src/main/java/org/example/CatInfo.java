@@ -1,10 +1,12 @@
 package org.example;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CatInfo {
     public String length;
     public String origin;
+    @JsonIgnore
     public String image_link;
     public String family_friendly;
     public String shedding;
@@ -53,5 +55,24 @@ public class CatInfo {
         this.min_life_expectancy = min_life_expectancy;
         this.max_life_expectancy = max_life_expectancy;
         this.name = name;
+    }
+
+    public static String getTranslate() {
+        return ("Информация о котах:\n" +
+                "length - длина\n" +
+                "origin - происхождение\n" +
+                "family_friendly - дружелюбность к семье\n" +
+                "shedding - линька\n" +
+                "general_health - общее здоровье\n" +
+                "playfulness - игривость\n" +
+                "children_friendly - дружелюбность к детям\n" +
+                "grooming - уход\n" +
+                "intelligence - интеллект\n" +
+                "other_pets_friendly - дружелюбность к другим питомцам\n" +
+                "min_weight - минимальный вес\n" +
+                "max_weight - максимальный вес\n" +
+                "min_life_expectancy - минимальная продолжительность жизни\n" +
+                "max_life_expectancy - максимальная продолжительность жизни\n" +
+                "name - название породы");
     }
 }

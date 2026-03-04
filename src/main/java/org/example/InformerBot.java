@@ -1,19 +1,28 @@
 package org.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.Scanner;
+import java.io.InputStream;
 
 public class InformerBot extends TelegramLongPollingBot {
     private String currentUrl = "";
     private String fullUrl;
     private String name;
     private String token;
+    private String apiKey = "xoWHUYmGbNxvUhxsCdkGQSGumHIoiZd12kukNKGb"; // apiKey обновлять с https://api-ninjas.com/profile
+    private ObjectMapper mapper = new ObjectMapper();
+    private CloseableHttpClient client = HttpClients.createDefault();
+    private boolean isStarted = false;
 
     public InformerBot(String name, String token) {
         this.token = token;
@@ -32,11 +41,19 @@ public class InformerBot extends TelegramLongPollingBot {
             long chatId = update.getMessage().getChatId();
             String text = update.getMessage().getText();
 
-            switch (text) {
-                case "/start": sendMessage(chatId, "Я пришлю тебе информацию о животном или породе кошки или собаки с картинкой.");
-                break;
-                case "/help": sendMessage(chatId, "Выбери: кошка, собака или другое животное?");
-                break;
+            switch (text.toLowerCase()) {
+                case "start": {
+                    sendMessage(chatId, "Я пришлю тебе информацию о животном или породе кошки или собаки. Для пород даже найдется картинка!\n" +
+                            "Выбери: кошка, собака или другое животное?");
+                    isStarted = true;
+                    break;
+                }
+                case "help":
+                    sendMessage(chatId, "Для начала работы с ботом введи команду \"start\"\n" +
+                            "Для помощи с переводом информации о котах введи команду \"catInfo\"\n" +
+                            "Для помощи с переводом информации о собаках введи команду \"dogInfo\"\n" +
+                            "Для помощи с переводом информации о других животных введи команду\"animalInfo\"");
+                    break;
                 case "кошка": {
                     currentUrl = "https://api.api-ninjas.com/v1/cats?name=";
                     sendMessage(chatId, "Введи название породы на английском. \n Например: \"Abyssinian\", \"american bobtail\"");
@@ -52,21 +69,60 @@ public class InformerBot extends TelegramLongPollingBot {
                     sendMessage(chatId, "Введи название породы на английском. \n Например: \"Cheetah\", \"cow\".");
                     break;
                 }
+                case "catinfo": {
+                    sendMessage(chatId, CatInfo.getTranslate());
+                    break;
+                }
+                case "doginfo": {
+                    sendMessage(chatId, DogInfo.getTranslate());
+                    break;
+                }
+                case "animalinfo": {
+                    sendMessage(chatId,AnimalInfo.getTranslate());
+                    break;
+                }
                 default: {
-                    fullUrl = currentUrl + text.toLowerCase().replace(" ", "%20");
-                    sendMessage(chatId, fullUrl);
+                    if (isStarted) {
+                        fullUrl = currentUrl + text.toLowerCase().replace(" ", "%20");
+                        try {
+                            if (currentUrl.contains("cats")) {
+                                Utils.getInfo(fullUrl, apiKey, client, mapper, CatInfo[].class, chatId, this);
+                            } else if (currentUrl.contains("dogs")) {
+                                Utils.getInfo(fullUrl, apiKey, client, mapper, DogInfo[].class, chatId, this);
+                            } else if (currentUrl.contains("animals")) {
+                                Utils.getInfo(fullUrl, apiKey, client, mapper, AnimalInfo[].class, chatId, this);
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Ошибка: " + e.getMessage());
+
+                        }
+                    }
+                    if (!isStarted) {
+                        sendMessage(chatId, "Для начала работы введи команду \"start\"");
+                    }
                 }
             }
         }
     }
 
-    public void sendMessage(long chatId, String text){
+    public void sendMessage(long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
 
         try {
             execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPhoto(long chatId, InputStream photoStream, String fileName) {
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(chatId);
+        sendPhoto.setPhoto(new InputFile(photoStream, fileName));
+        try {
+            execute(sendPhoto);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
