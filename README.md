@@ -1,11 +1,9 @@
 # НЕ ВЫКЛАДЫВАТЬ В ПУБЛИЧНЫЙ ДОСТУП!
-## В репозитории лежит токен бота и API ключ с api-ninjas - их смогут украсть и использовать.
+## В истории коммитов есть токен бота и API ключ с api-ninjas - их смогут украсть и использовать.
 
 ## Описание:
-В классе main уже есть название бота, его токен и API-ключ c api-ninjas. При необходимости поменять либо реализовать чреез config.properties (как в публичном репозитории). 
-apiKey здесь: https://api-ninjas.com/profil
-
-Запустить файл AnimalsInformer.jar (out/artifacts/AnimalsInformer_jar/AnimalsInformer.jar) и использовать телеграмм-бота @Animals_Informer_Bot. 
+В файле config.properties указаны название и токен бота @Animals_Informer_Bot и API-ключ c https://api-ninjas.com/profil. При необходимости поменять в файле на нужное. (api-key только с https://api-ninjas.com/profil)
+Запустить файл AnimalsInformer.jar (out/artifacts/AnimalsInformer_jar/AnimalsInformer.jar) и использовать привязанного телеграмм-бота. 
 Также можно запустить с помощью консоли: "- java -jar [абсолютный путь к файлу AnimalsInformer.jar]". В этом случае в консоли будут отображаться сообщения от чатов.
 
 ## Основные команды бота:

@@ -11,6 +11,9 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 import java.io.InputStream;
 
@@ -28,6 +31,7 @@ public class InformerBot extends TelegramLongPollingBot {
         this.token = token;
         this.name = name;
         this.apiKey = apiKey;
+        loadConfig();
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(this);
@@ -140,5 +144,18 @@ public class InformerBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return token;
+    }
+
+    private void loadConfig() {
+        Properties prop = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            prop.load(input);
+            this.name = prop.getProperty("BOT_NAME");
+            this.token = prop.getProperty("BOT_TOKEN");
+            this.apiKey = prop.getProperty("API_NINJAS_KEY");
+        } catch (IOException e) {
+            System.out.println("Ошибка: Не найден файл config.properties!");
+            System.exit(1);
+        }
     }
 }
