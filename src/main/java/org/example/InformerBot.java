@@ -19,14 +19,15 @@ public class InformerBot extends TelegramLongPollingBot {
     private String fullUrl;
     private String name;
     private String token;
-    private String apiKey = "xoWHUYmGbNxvUhxsCdkGQSGumHIoiZd12kukNKGb"; // apiKey обновлять с https://api-ninjas.com/profile
+    private String apiKey;
     private ObjectMapper mapper = new ObjectMapper();
     private CloseableHttpClient client = HttpClients.createDefault();
     private boolean isStarted = false;
 
-    public InformerBot(String name, String token) {
+    public InformerBot(String name, String token, String apiKey) {
         this.token = token;
         this.name = name;
+        this.apiKey = apiKey;
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(this);
@@ -41,10 +42,11 @@ public class InformerBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
             String text = update.getMessage().getText();
+            System.out.println("Из чата " + chatId + " отправили сообщение: \"" + text + "\".");
 
             switch (text.toLowerCase()) {
                 case "start": {
-                    sendMessage(chatId, "Я пришлю тебе картинку и информацию породе кошки или собаки или информацию о другом животном.\n" +
+                    sendMessage(chatId, "Я пришлю тебе картинку породы кошки или собаки и информацию о ней или информацию о другом животном.\n" +
                             "Выбери: кошка, собака или другое животное?");
                     isStarted = true;
                     break;
@@ -79,7 +81,7 @@ public class InformerBot extends TelegramLongPollingBot {
                     break;
                 }
                 case "animalinfo": {
-                    sendMessage(chatId,AnimalInfo.translateInfo());
+                    sendMessage(chatId, AnimalInfo.translateInfo());
                     break;
                 }
                 default: {
@@ -93,10 +95,9 @@ public class InformerBot extends TelegramLongPollingBot {
                             } else if (currentUrl.contains("animals")) {
                                 Utils.getInfo(fullUrl, apiKey, client, mapper, AnimalInfo[].class, chatId, this);
                             }
-                        } catch (IndexOutOfBoundsException e){
-                            System.out.println("Из чата " + chatId + ". Порода или команда " + text.toLowerCase() + " не найдена.");
-                        }
-                        catch (Exception e) {
+                        } catch (IndexOutOfBoundsException e) {
+                            System.out.println("Из чата " + chatId + ". Порода или команда \"" + text.toLowerCase() + "\" не найдена.");
+                        } catch (Exception e) {
                             System.out.println("Из чата " + chatId + ". Ошибка: " + e.getMessage());
                         }
                     }
