@@ -80,7 +80,7 @@ public class DogInfo {
         this.name = name;
     }
 
-    public static String getTranslate() {
+    public static String translateInfo() {
         return ("Информация о собаках:\n" +
                 "main_prey - основная добыча\n" +
                 "distinctive_feature - отличительная особенность\n" +

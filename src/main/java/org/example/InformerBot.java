@@ -30,8 +30,9 @@ public class InformerBot extends TelegramLongPollingBot {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(this);
+            System.out.println("Бот " + name + " зарегистрирован.");
         } catch (TelegramApiException e) {
-            System.out.println("Не удалось зарегистрировать бота.");
+            System.out.println("Не удалось зарегистрировать бота " + name);
         }
     }
 
@@ -43,7 +44,7 @@ public class InformerBot extends TelegramLongPollingBot {
 
             switch (text.toLowerCase()) {
                 case "start": {
-                    sendMessage(chatId, "Я пришлю тебе информацию о животном или породе кошки или собаки. Для пород даже найдется картинка!\n" +
+                    sendMessage(chatId, "Я пришлю тебе картинку и информацию породе кошки или собаки или информацию о другом животном.\n" +
                             "Выбери: кошка, собака или другое животное?");
                     isStarted = true;
                     break;
@@ -70,15 +71,15 @@ public class InformerBot extends TelegramLongPollingBot {
                     break;
                 }
                 case "catinfo": {
-                    sendMessage(chatId, CatInfo.getTranslate());
+                    sendMessage(chatId, CatInfo.translateInfo());
                     break;
                 }
                 case "doginfo": {
-                    sendMessage(chatId, DogInfo.getTranslate());
+                    sendMessage(chatId, DogInfo.translateInfo());
                     break;
                 }
                 case "animalinfo": {
-                    sendMessage(chatId,AnimalInfo.getTranslate());
+                    sendMessage(chatId,AnimalInfo.translateInfo());
                     break;
                 }
                 default: {
@@ -92,9 +93,11 @@ public class InformerBot extends TelegramLongPollingBot {
                             } else if (currentUrl.contains("animals")) {
                                 Utils.getInfo(fullUrl, apiKey, client, mapper, AnimalInfo[].class, chatId, this);
                             }
-                        } catch (Exception e) {
-                            System.out.println("Ошибка: " + e.getMessage());
-
+                        } catch (IndexOutOfBoundsException e){
+                            System.out.println("Из чата " + chatId + ". Порода или команда " + text.toLowerCase() + " не найдена.");
+                        }
+                        catch (Exception e) {
+                            System.out.println("Из чата " + chatId + ". Ошибка: " + e.getMessage());
                         }
                     }
                     if (!isStarted) {

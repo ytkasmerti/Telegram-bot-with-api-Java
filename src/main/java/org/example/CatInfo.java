@@ -57,7 +57,7 @@ public class CatInfo {
         this.name = name;
     }
 
-    public static String getTranslate() {
+    public static String translateInfo() {
         return ("Информация о котах:\n" +
                 "length - длина\n" +
                 "origin - происхождение\n" +

@@ -20,7 +20,7 @@ public class AnimalInfo {
         this.characteristics = characteristics;
     }
 
-    public static String getTranslate() {
+    public static String translateInfo() {
         return ("Информация о животных:\n" +
                 "kingdom - царство\n" +
                 "phylum - тип\n" +
