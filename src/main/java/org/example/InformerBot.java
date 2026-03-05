@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.File;
 import java.util.Properties;
 
 import java.io.InputStream;
@@ -27,10 +27,7 @@ public class InformerBot extends TelegramLongPollingBot {
     private CloseableHttpClient client = HttpClients.createDefault();
     private boolean isStarted = false;
 
-    public InformerBot(String name, String token, String apiKey) {
-        this.token = token;
-        this.name = name;
-        this.apiKey = apiKey;
+    public InformerBot() {
         loadConfig();
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
@@ -148,13 +145,38 @@ public class InformerBot extends TelegramLongPollingBot {
 
     private void loadConfig() {
         Properties prop = new Properties();
-        try (FileInputStream input = new FileInputStream("config.properties")) {
-            prop.load(input);
-            this.name = prop.getProperty("BOT_NAME");
-            this.token = prop.getProperty("BOT_TOKEN");
-            this.apiKey = prop.getProperty("API_NINJAS_KEY");
-        } catch (IOException e) {
+
+        try {
+            String jarPath = InformerBot.class.getProtectionDomain()
+                    .getCodeSource().getLocation().toURI().getPath();
+            if (jarPath.startsWith("/") && System.getProperty("os.name").contains("Windows")) {
+                jarPath = jarPath.substring(1);
+            }
+
+            String jarDir = new File(jarPath).getParent();
+            String configPath = jarDir + File.separator + "config.properties";
+
+            try (FileInputStream input = new FileInputStream(configPath)) {
+                prop.load(input);
+                this.name = prop.getProperty("BOT_NAME");
+                this.token = prop.getProperty("BOT_TOKEN");
+                this.apiKey = prop.getProperty("API_NINJAS_KEY");
+            }
+
+        } catch (Exception e) {
             System.out.println("Ошибка: Не найден файл config.properties!");
+            System.out.println("Положи файл config.properties в папку с jar-файлом:");
+            try {
+                String jarPath = InformerBot.class.getProtectionDomain()
+                        .getCodeSource().getLocation().toURI().getPath();
+                if (jarPath.startsWith("/") && System.getProperty("os.name").contains("Windows")) {
+                    jarPath = jarPath.substring(1);
+                }
+                String jarDir = new File(jarPath).getParent();
+                System.out.println(jarDir);
+            } catch (Exception ex) {
+                System.out.println("(не удалось определить путь)");
+            }
             System.exit(1);
         }
     }
